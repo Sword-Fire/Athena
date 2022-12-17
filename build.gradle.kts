@@ -8,19 +8,43 @@ plugins {
 }
 
 group = "net.geekmc.athena"
-version = "1.0-SNAPSHOT"
+version = "0.1.0-SNAPSHOT"
 
 repositories {
+    maven(url = "https://jitpack.io")
     mavenCentral()
     mavenLocal()
 }
 
 dependencies {
     if (parent?.name == "swork-fire-workspace") {
-        compileOnly(project(":turing-core"))
+        implementation(project(":turing-core"))
     } else {
         // TODO: pin version
-        compileOnly("net.geekmc.swork-fire:turing-core:+")
+        implementation("net.geekmc.swork-fire:turing-core:+")
+    }
+
+    // TODO: pin version
+    compileOnly("com.github.Minestom:Minestom:-SNAPSHOT") {
+        exclude(group = "org.tinylog")
+    }
+
+    implementation("org.jetbrains.kotlin:kotlin-scripting-common")
+    implementation("org.jetbrains.kotlin:kotlin-scripting-jvm")
+    implementation("org.jetbrains.kotlin:kotlin-scripting-dependencies")
+    implementation("org.jetbrains.kotlin:kotlin-scripting-dependencies-maven")
+    implementation("org.jetbrains.kotlin:kotlin-scripting-jvm-host")
+
+    compileOnly("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4")
+}
+
+// Process some props in extension.json
+@Suppress("UnstableApiUsage")
+tasks.withType<ProcessResources> {
+    filter {
+        return@filter if ("!@!version!@!" in it) {
+            it.replace("!@!version!@!", version as String)
+        } else it
     }
 }
 

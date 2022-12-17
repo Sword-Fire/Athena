@@ -1,0 +1,17 @@
+{
+  "entrypoint": "net.geekmc.athena.Athena",
+  "name": "AthenaExtension",
+  "version": "!@!version!@!",
+  "dependencies": [
+    "TuringCoreExtension"
+  ],
+  "externalDependencies": {
+    "repositories": [
+      {
+        "name": "Central",
+        "url": "https://repo1.maven.org/maven2/"
+      }
+    ],
+    "artifacts": [ "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4" ]
+  }
+}
