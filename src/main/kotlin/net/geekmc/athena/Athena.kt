@@ -31,7 +31,7 @@ class Athena : Extension() {
         runBlocking {
             ItemLoader.loadAsync(*items.map {
                 it.readText().toScriptSource()
-            }.toTypedArray())
+            }.toTypedArray()).forEach { logger.info(it.toString()) }
         }
 //        logger.info("脚本数量为 ${items.size}")
 //        val times = 20
