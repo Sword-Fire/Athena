@@ -1,9 +1,9 @@
 {
   "entrypoint": "net.geekmc.athena.Athena",
-  "name": "AthenaExtension",
+  "name": "Athena",
   "version": "!@!version!@!",
   "dependencies": [
-    "TuringCoreExtension"
+    "TuringCore"
   ],
   "externalDependencies": {
     "repositories": [
