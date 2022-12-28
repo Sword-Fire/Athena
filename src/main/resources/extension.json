@@ -1,7 +1,7 @@
 {
   "entrypoint": "net.geekmc.athena.Athena",
   "name": "Athena",
-  "version": "!@!version!@!",
+  "version": "@!extensionVersion@",
   "dependencies": [
     "TuringCore"
   ],
@@ -12,6 +12,13 @@
         "url": "https://repo1.maven.org/maven2/"
       }
     ],
-    "artifacts": [ "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4" ]
+    "artifacts": [
+      "org.jetbrains.kotlinx:kotlinx-coroutines-core:@!dependencyVersion@",
+      "org.jetbrains.kotlin:kotlin-scripting-common:@!dependencyVersion@",
+      "org.jetbrains.kotlin:kotlin-scripting-jvm:@!dependencyVersion@",
+      "org.jetbrains.kotlin:kotlin-scripting-dependencies:@!dependencyVersion@",
+      "org.jetbrains.kotlin:kotlin-scripting-dependencies-maven:@!dependencyVersion@",
+      "org.jetbrains.kotlin:kotlin-scripting-jvm-host:@!dependencyVersion@"
+    ]
   }
 }

@@ -9,6 +9,7 @@ plugins {
 
 group = "net.geekmc.athena"
 version = "0.1.0-SNAPSHOT"
+val outputName = "${project.name}-$version.jar"
 
 repositories {
     maven(url = "https://jitpack.io")
@@ -18,10 +19,10 @@ repositories {
 
 dependencies {
     if (parent?.name == "swork-fire-workspace") {
-        implementation(project(":turing-core"))
+        compileOnly(project(":turing-core"))
     } else {
         // TODO: pin version
-        implementation("net.geekmc.swork-fire:turing-core:+")
+        compileOnly("net.geekmc.swork-fire:turing-core:+")
     }
 
     // TODO: pin version
@@ -29,27 +30,53 @@ dependencies {
         exclude(group = "org.tinylog")
     }
 
-    implementation("org.jetbrains.kotlin:kotlin-scripting-common")
-    implementation("org.jetbrains.kotlin:kotlin-scripting-jvm")
-    implementation("org.jetbrains.kotlin:kotlin-scripting-dependencies")
-    implementation("org.jetbrains.kotlin:kotlin-scripting-dependencies-maven")
-    implementation("org.jetbrains.kotlin:kotlin-scripting-jvm-host")
+    compileOnly("org.jetbrains.kotlinx:kotlinx-coroutines-core:${project.ext["version.kotlinx-coroutines-core"]}")
+    compileOnly("org.jetbrains.kotlin:kotlin-scripting-common:${project.ext["version.kotlinx-coroutines-core"]}")
+    compileOnly("org.jetbrains.kotlin:kotlin-scripting-jvm:${project.ext["version.kotlin-scripting-jvm"]}")
+    compileOnly("org.jetbrains.kotlin:kotlin-scripting-dependencies:${project.ext["version.kotlin-scripting-dependencies"]}")
+    compileOnly("org.jetbrains.kotlin:kotlin-scripting-dependencies-maven:${project.ext["version.kotlin-scripting-dependencies-maven"]}")
+    compileOnly("org.jetbrains.kotlin:kotlin-scripting-jvm-host:${project.ext["version.kotlin-scripting-jvm-host"]}")
 
-    compileOnly("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4")
 }
 
 // Process some props in extension.json
 @Suppress("UnstableApiUsage")
 tasks.withType<ProcessResources> {
     filter {
-        return@filter if ("!@!version!@!" in it) {
-            it.replace("!@!version!@!", version as String)
-        } else it
+
+        val extensionVersionPlaceholder = "@!extensionVersion@"
+        val dependencyVersionPlaceholder = "@!dependencyVersion@"
+
+        // 替换拓展版本。
+        var ret = it
+        if (extensionVersionPlaceholder in ret) {
+            ret = ret.replace(extensionVersionPlaceholder, version as String)
+        }
+
+        // 替换Maven依赖版本。
+        @Suppress("UNCHECKED_CAST")
+        val dependencyToVersionMap = project.ext["version.dependencyToVersionMap"] as Map<String, String>
+
+        if ("@!dependencyVersion@" in ret) {
+            var replaced = false
+            for ((dependency, version) in dependencyToVersionMap) {
+                if (dependency in ret) {
+                    ret = ret.replace(dependencyVersionPlaceholder, version)
+                    replaced = true
+                    break
+                }
+            }
+            if (!replaced) {
+                throw IllegalStateException("Dependency not found in dependencyToVersionMap: $ret")
+            }
+        }
+        return@filter ret
     }
 }
 
 tasks.withType<ShadowJar> {
     transform(Log4j2PluginsCacheFileTransformer::class.java)
+    archiveFileName.set(outputName)
 }
 
 tasks.withType<Test> {
@@ -58,4 +85,8 @@ tasks.withType<Test> {
 
 tasks.withType<KotlinCompile> {
     kotlinOptions.jvmTarget = "17"
+}
+
+tasks.withType<Jar> {
+    archiveFileName.set(outputName)
 }

@@ -66,9 +66,9 @@ class Athena : Extension() {
     }
 
     private fun registerFramework() {
-        TuringFrameWork.registerExtension("net.geekmc.minotaur", this).apply {
-            consolePrefix = "[Minotaur] "
-            playerPrefix = "&f[&gMinotaur&f] ".toComponent()
+        TuringFrameWork.registerExtension("net.geekmc.athena", this).apply {
+            consolePrefix = "[Athena] "
+            playerPrefix = "&f[&gAthena&f] ".toComponent()
         }
     }
 }
