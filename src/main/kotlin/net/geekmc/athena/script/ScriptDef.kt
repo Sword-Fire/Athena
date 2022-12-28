@@ -3,22 +3,22 @@ package net.geekmc.athena.script
 import kotlin.script.experimental.annotations.KotlinScript
 import kotlin.script.experimental.api.ScriptCompilationConfiguration
 import kotlin.script.experimental.api.defaultImports
+import kotlin.script.experimental.jvm.dependenciesFromClassContext
 import kotlin.script.experimental.jvm.dependenciesFromCurrentContext
 import kotlin.script.experimental.jvm.jvm
 
 @KotlinScript(
-    fileExtension = "item.kts",
-    compilationConfiguration = ItemScriptConfiguration::class
+    fileExtension = "kts",
+    compilationConfiguration = AthenaScriptConfiguration::class
 )
-abstract class ItemScript
+abstract class AthenaScript
 
-object ItemScriptConfiguration : ScriptCompilationConfiguration({
+object AthenaScriptConfiguration : ScriptCompilationConfiguration({
     jvm {
         defaultImports.append(
-            "net.geekmc.athena.script.item",
+            "net.geekmc.athena.script.dsl.*",
             "net.minestom.server.item.*",
         )
-//        dependenciesFromClassContext(Item::class, wholeClasspath = true)
-        dependenciesFromCurrentContext(wholeClasspath = true)
+        dependenciesFromClassContext(AthenaScript::class, wholeClasspath = true)
     }
 })

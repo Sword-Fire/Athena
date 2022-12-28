@@ -2,6 +2,10 @@ package net.geekmc.athena.script
 
 import kotlinx.coroutines.*
 import net.geekmc.athena.Athena
+import net.geekmc.athena.script.entity.BaseEntity
+import net.geekmc.athena.script.entity.Group
+import net.geekmc.athena.script.repo.ItemRepo
+import net.geekmc.athena.script.repo.loaderListener
 import net.geekmc.turingcore.util.coroutine.MinestomSync
 import net.kyori.adventure.text.logger.slf4j.ComponentLogger
 import java.io.FileInputStream
@@ -11,17 +15,29 @@ import java.io.ObjectOutputStream
 import java.nio.file.Files
 import java.nio.file.Path
 import java.security.MessageDigest
+import kotlin.io.path.isReadable
+import kotlin.io.path.listDirectoryEntries
+import kotlin.io.path.readText
 import kotlin.script.experimental.api.*
+import kotlin.script.experimental.host.toScriptSource
+import kotlin.script.experimental.jvm.baseClassLoader
+import kotlin.script.experimental.jvm.jvm
 import kotlin.script.experimental.jvmhost.BasicJvmScriptingHost
+import kotlin.script.experimental.jvmhost.createJvmCompilationConfigurationFromTemplate
+import kotlin.script.experimental.jvmhost.createJvmEvaluationConfigurationFromTemplate
 
-/**
- * @param R The type of the return value
- */
-abstract class ScriptLoader<R> {
-    companion object {
-        const val SCRIPT_CACHE_DIR_NAME = "script_cache"
-        val CHECKSUM_CHECK_REGEX = """\b([a-f0-9]{40})\b""".toRegex()
-    }
+interface OnScriptLoadListener {
+    fun onScriptLoaded(obj: BaseEntity)
+}
+
+object ScriptLoader {
+    const val SCRIPT_CACHE_DIR_NAME = "script_cache"
+    val CHECKSUM_CHECK_REGEX = """\b([a-f0-9]{40})\b""".toRegex()
+
+    const val ITEMS_DIR_NAME = "script"
+    const val ITEMS_POSTFIX = ".kts"
+
+    private val loadListeners = mutableListOf<OnScriptLoadListener>()
 
     private val logger = ComponentLogger.logger()
 
@@ -33,13 +49,36 @@ abstract class ScriptLoader<R> {
 
     private val host = BasicJvmScriptingHost()
 
-    //  override val compilationConfiguration = createJvmCompilationConfigurationFromTemplate<ItemScript>()
-    abstract val compilationConfiguration: ScriptCompilationConfiguration
+    private val compilationConfiguration = createJvmCompilationConfigurationFromTemplate<AthenaScript>()
 
-    //  override val evaluationConfiguration = createJvmEvaluationConfigurationFromTemplate<ItemScript> {
-    //      jvm { baseClassLoader(ItemScript::class.java.classLoader) }
-    //  }
-    abstract val evaluationConfiguration: ScriptEvaluationConfiguration
+    private val evaluationConfiguration = createJvmEvaluationConfigurationFromTemplate<AthenaScript> {
+        jvm { baseClassLoader(AthenaScript::class.java.classLoader) }
+    }
+
+    private val scriptsDir = Athena.INSTANCE.dataDirectory.resolve(ITEMS_DIR_NAME)
+
+    init {
+        addOnScriptLoadListener(ItemRepo.loaderListener())
+    }
+
+    fun addOnScriptLoadListener(listener: OnScriptLoadListener.(obj: BaseEntity) -> Unit) {
+        addOnScriptLoadListener(object : OnScriptLoadListener {
+            override fun onScriptLoaded(obj: BaseEntity) {
+                listener(this, obj)
+            }
+        })
+    }
+
+    fun addOnScriptLoadListener(listener: OnScriptLoadListener) {
+        loadListeners.add(listener)
+    }
+
+    private fun notifyListeners(obj: BaseEntity) {
+        if (obj is Group) {
+            obj.entities.forEach { notifyListeners(it) }
+        }
+        loadListeners.forEach { it.onScriptLoaded(obj) }
+    }
 
     private fun createCacheDir() {
         Files.createDirectories(scriptCacheDir)
@@ -72,7 +111,7 @@ abstract class ScriptLoader<R> {
         objectOutputStream.close()
     }
 
-    private suspend fun compileScript(
+    suspend fun compileScript(
         script: SourceCode,
         useCache: Boolean = true,
         saveCache: Boolean = true
@@ -98,7 +137,7 @@ abstract class ScriptLoader<R> {
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    suspend fun loadAsync(vararg scripts: SourceCode, useCache: Boolean = true, saveCache: Boolean = true): List<R> {
+    suspend fun loadAsync(vararg scripts: SourceCode, useCache: Boolean = true, saveCache: Boolean = true): List<BaseEntity> {
         createCacheDir()
         val compileds = withContext(Dispatchers.IO.limitedParallelism(20)) {
             scripts.map { script ->
@@ -111,7 +150,21 @@ abstract class ScriptLoader<R> {
             check(ret is ResultValue.Value)
             checkNotNull(ret.value)
             @Suppress("UNCHECKED_CAST")
-            ret.value as R
+            (ret.value as BaseEntity).apply {
+                notifyListeners(this)
+            }
         }
+    }
+
+    suspend fun reloadScripts() {
+        withContext(Dispatchers.IO) {
+            Files.createDirectories(scriptsDir)
+        }
+        val items = scriptsDir.listDirectoryEntries().filter {
+            it.isReadable() && it.toString().endsWith(ITEMS_POSTFIX)
+        }
+        loadAsync(*items.map {
+            it.readText().toScriptSource()
+        }.toTypedArray())
     }
 }
