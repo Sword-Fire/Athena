@@ -10,9 +10,7 @@ import java.nio.file.Files
 import kotlin.io.path.isReadable
 import kotlin.io.path.listDirectoryEntries
 import kotlin.io.path.readText
-import kotlin.script.experimental.api.SourceCode
 import kotlin.script.experimental.host.toScriptSource
-import kotlin.system.measureTimeMillis
 
 @Suppress("unused")
 class Athena : Extension() {

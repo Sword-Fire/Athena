@@ -36,6 +36,7 @@ dependencies {
     compileOnly("org.jetbrains.kotlin:kotlin-scripting-dependencies:${project.ext["version.kotlin-scripting-dependencies"]}")
     compileOnly("org.jetbrains.kotlin:kotlin-scripting-dependencies-maven:${project.ext["version.kotlin-scripting-dependencies-maven"]}")
     compileOnly("org.jetbrains.kotlin:kotlin-scripting-jvm-host:${project.ext["version.kotlin-scripting-jvm-host"]}")
+    compileOnly("com.github.Project-Cepi:KStom:${project.ext["version.KStom"]}")
 
 }
 
