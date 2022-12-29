@@ -1,6 +1,6 @@
 package net.geekmc.athena
 
-import net.geekmc.athena.script.ItemLoader
+import net.geekmc.athena.script.ScriptLoader
 import net.minestom.server.command.builder.Command
 import net.minestom.server.command.builder.arguments.ArgumentType
 import kotlin.script.experimental.host.toScriptSource
@@ -15,7 +15,7 @@ object CommandRun : Command("athenarun") {
 
             val script = ktsPath.toFile().toScriptSource()
 
-            ItemLoader.loadSync(script)
+            ScriptLoader.loadSync(script)
 
             sender.sendMessage("Hello, world!")
         }, ktsName)
