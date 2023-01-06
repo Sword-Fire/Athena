@@ -6,11 +6,6 @@ import net.geekmc.turingcore.framework.TuringFrameWork
 import net.geekmc.turingcore.util.color.toComponent
 import net.minestom.server.MinecraftServer
 import net.minestom.server.extensions.Extension
-import java.nio.file.Files
-import kotlin.io.path.isReadable
-import kotlin.io.path.listDirectoryEntries
-import kotlin.io.path.readText
-import kotlin.script.experimental.host.toScriptSource
 
 @Suppress("unused")
 class Athena : Extension() {
@@ -31,7 +26,6 @@ class Athena : Extension() {
 
         registerFramework()
         MinecraftServer.getCommandManager().register(CommandRun)
-
         loadAllScripts()
 
         logger.info("Athena initialized.")
