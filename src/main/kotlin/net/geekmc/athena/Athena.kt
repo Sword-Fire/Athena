@@ -2,8 +2,6 @@ package net.geekmc.athena
 
 import kotlinx.coroutines.*
 import net.geekmc.athena.script.ScriptLoader
-import net.geekmc.turingcore.framework.TuringFrameWork
-import net.geekmc.turingcore.util.color.toComponent
 import net.minestom.server.MinecraftServer
 import net.minestom.server.extensions.Extension
 
@@ -24,7 +22,6 @@ class Athena : Extension() {
     override fun initialize() {
         INSTANCE = this
 
-        registerFramework()
         MinecraftServer.getCommandManager().register(CommandRun)
         loadAllScripts()
 
@@ -33,12 +30,5 @@ class Athena : Extension() {
 
     override fun terminate() {
         logger.info("Athena terminated.")
-    }
-
-    private fun registerFramework() {
-        TuringFrameWork.registerExtension("net.geekmc.minotaur", this).apply {
-            consolePrefix = "[Minotaur] "
-            playerPrefix = "&f[&gMinotaur&f] ".toComponent()
-        }
     }
 }
