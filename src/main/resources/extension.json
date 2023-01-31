@@ -3,7 +3,8 @@
   "name": "Athena",
   "version": "@!extensionVersion@",
   "dependencies": [
-    "TuringCore"
+    "TuringCore",
+    "KStom"
   ],
   "externalDependencies": {
     "repositories": [
