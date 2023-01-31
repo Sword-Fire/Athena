@@ -26,10 +26,10 @@ dependencies {
     }
 
     if (parent?.name == "swork-fire-workspace") {
-        compileOnly(project(":kstom"))
+        implementation(project(":kstom"))
     } else {
         // TODO: pin version
-        compileOnly("org.ktorm:ktorm-core:${project.ext["version.ktorm-core"]}")
+        implementation("org.ktorm:ktorm-core:${project.ext["version.ktorm-core"]}")
     }
 
     // TODO: pin version
