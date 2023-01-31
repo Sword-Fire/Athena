@@ -25,6 +25,13 @@ dependencies {
         compileOnly("net.geekmc.swork-fire:turing-core:+")
     }
 
+    if (parent?.name == "swork-fire-workspace") {
+        compileOnly(project(":kstom"))
+    } else {
+        // TODO: pin version
+        compileOnly("org.ktorm:ktorm-core:${project.ext["version.ktorm-core"]}")
+    }
+
     // TODO: pin version
     compileOnly("com.github.Minestom:Minestom:-SNAPSHOT") {
         exclude(group = "org.tinylog")
@@ -36,8 +43,6 @@ dependencies {
     compileOnly("org.jetbrains.kotlin:kotlin-scripting-dependencies:${project.ext["version.kotlin-scripting-dependencies"]}")
     compileOnly("org.jetbrains.kotlin:kotlin-scripting-dependencies-maven:${project.ext["version.kotlin-scripting-dependencies-maven"]}")
     compileOnly("org.jetbrains.kotlin:kotlin-scripting-jvm-host:${project.ext["version.kotlin-scripting-jvm-host"]}")
-    compileOnly("com.github.Project-Cepi:KStom:${project.ext["version.KStom"]}")
-
 }
 
 // Process some props in extension.json
