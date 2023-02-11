@@ -1,0 +1,2 @@
+command-copy-example-succ: "复制示例文件成功"
+command-copy-example-fail: "复制示例文件失败：{0}"
