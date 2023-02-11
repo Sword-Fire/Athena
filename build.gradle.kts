@@ -52,6 +52,8 @@ dependencies {
     compileOnly("org.jetbrains.kotlin:kotlin-scripting-dependencies:${project.ext["version.kotlin-scripting-dependencies"]}")
     compileOnly("org.jetbrains.kotlin:kotlin-scripting-dependencies-maven:${project.ext["version.kotlin-scripting-dependencies-maven"]}")
     compileOnly("org.jetbrains.kotlin:kotlin-scripting-jvm-host:${project.ext["version.kotlin-scripting-jvm-host"]}")
+
+    compileOnly("org.kodein.di:kodein-di-jvm:${project.ext["version.kodein-di-jvm"]}")
 }
 
 // Process some props in extension.json

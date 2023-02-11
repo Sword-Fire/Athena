@@ -1,16 +1,19 @@
 package net.geekmc.athena
 
 import kotlinx.coroutines.*
+import net.geekmc.athena.di.initAthenaDi
 import net.geekmc.athena.script.ScriptLoader
-import net.minestom.server.MinecraftServer
+import net.geekmc.turingcore.library.framework.AutoRegisterFramework
 import net.minestom.server.extensions.Extension
 
 @Suppress("unused")
 class Athena : Extension() {
-    companion object {
-        lateinit var INSTANCE: Athena
-            private set
-
+    private val autoRegisterFramework by lazy {
+        AutoRegisterFramework.load(
+            this::class.java.classLoader,
+            "net.geekmc.athena",
+            this.logger
+        )
     }
 
     private fun loadAllScripts() {
@@ -19,16 +22,19 @@ class Athena : Extension() {
         }
     }
 
-    override fun initialize() {
-        INSTANCE = this
+    override fun preInitialize() {
+        initAthenaDi(this)
+    }
 
-        MinecraftServer.getCommandManager().register(CommandRun)
+    override fun initialize() {
+        autoRegisterFramework.registerAll()
         loadAllScripts()
 
         logger.info("Athena initialized.")
     }
 
     override fun terminate() {
+        autoRegisterFramework.unregisterAll()
         logger.info("Athena terminated.")
     }
 }

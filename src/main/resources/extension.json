@@ -19,7 +19,8 @@
       "org.jetbrains.kotlin:kotlin-scripting-jvm:@!dependencyVersion@",
       "org.jetbrains.kotlin:kotlin-scripting-dependencies:@!dependencyVersion@",
       "org.jetbrains.kotlin:kotlin-scripting-dependencies-maven:@!dependencyVersion@",
-      "org.jetbrains.kotlin:kotlin-scripting-jvm-host:@!dependencyVersion@"
+      "org.jetbrains.kotlin:kotlin-scripting-jvm-host:@!dependencyVersion@",
+      "org.kodein.di:kodein-di-jvm:@!dependencyVersion@"
     ]
   }
 }

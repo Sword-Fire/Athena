@@ -1,13 +1,15 @@
 package net.geekmc.athena.script
 
 import kotlinx.coroutines.*
-import net.geekmc.athena.Athena
+import net.geekmc.athena.di.AthenaDIAware
+import net.geekmc.athena.di.PathTags
 import net.geekmc.athena.script.entity.BaseEntity
 import net.geekmc.athena.script.entity.Group
 import net.geekmc.athena.script.repo.ItemRepo
 import net.geekmc.athena.script.repo.loaderListener
 import net.geekmc.turingcore.util.coroutine.MinestomSync
 import net.kyori.adventure.text.logger.slf4j.ComponentLogger
+import org.kodein.di.instance
 import java.io.FileInputStream
 import java.io.FileOutputStream
 import java.io.ObjectInputStream
@@ -15,6 +17,7 @@ import java.io.ObjectOutputStream
 import java.nio.file.Files
 import java.nio.file.Path
 import java.security.MessageDigest
+import kotlin.io.path.div
 import kotlin.io.path.isReadable
 import kotlin.io.path.listDirectoryEntries
 import kotlin.io.path.readText
@@ -30,7 +33,7 @@ interface OnScriptLoadListener {
     fun onScriptLoaded(obj: BaseEntity)
 }
 
-object ScriptLoader {
+object ScriptLoader : AthenaDIAware {
     const val SCRIPT_CACHE_DIR_NAME = "script_cache"
     val CHECKSUM_CHECK_REGEX = """\b([a-f0-9]{40})\b""".toRegex()
 
@@ -41,9 +44,8 @@ object ScriptLoader {
 
     private val logger = ComponentLogger.logger()
 
-    val scriptCacheDir: Path by lazy {
-        Athena.INSTANCE.dataDirectory.resolve(SCRIPT_CACHE_DIR_NAME)
-    }
+    private val dataDirectory: Path by di.instance(tag = PathTags.EXTENSION_FOLDER)
+    val scriptCacheDir: Path = dataDirectory / SCRIPT_CACHE_DIR_NAME
 
     private val scope = CoroutineScope(Dispatchers.MinestomSync)
 
@@ -55,7 +57,7 @@ object ScriptLoader {
         jvm { baseClassLoader(AthenaScript::class.java.classLoader) }
     }
 
-    private val scriptsDir = Athena.INSTANCE.dataDirectory.resolve(ITEMS_DIR_NAME)
+    private val scriptsDir = dataDirectory / ITEMS_DIR_NAME
 
     init {
         addOnScriptLoadListener(ItemRepo.loaderListener())
