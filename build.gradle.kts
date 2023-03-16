@@ -22,6 +22,7 @@ val isInWorkSpace = parent?.name == "swork-fire-workspace"
 if (isInWorkSpace) {
     tasks.getByName("build") {
         dependsOn(":kstom:build")
+        dependsOn(":kstom:jar")
         dependsOn(":turing-core:build")
     }
 }
